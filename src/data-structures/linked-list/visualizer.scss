@@ -1,0 +1,150 @@
+.container {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #f4f6f9;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.controls {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  margin-bottom: 50px;
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+}
+
+.input {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  width: 100px;
+}
+
+.button {
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  align-self: flex-end;
+}
+
+.visualContainer {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  max-width: 100%;
+  padding: 40px 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  min-height: 180px;
+}
+
+.nodeWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  padding: 25px 0;
+  min-width: 90px;
+}
+
+.headPointerTag {
+  position: absolute;
+  top: 0px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #007bff;
+  letter-spacing: 0.5px;
+}
+
+.tailPointerTag {
+  position: absolute;
+  bottom: 0px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #e83e8c;
+  letter-spacing: 0.5px;
+}
+
+.node {
+  display: flex;
+  border: 2px solid #333;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.nodeData {
+  padding: 12px 18px;
+  background-color: #e9ecef;
+  font-weight: bold;
+  min-width: 45px;
+  text-align: center;
+  border-right: 2px solid #333;
+}
+
+.nodeNext {
+  padding: 12px 10px;
+  background-color: #f8f9fa;
+  font-family: monospace;
+  color: #666;
+}
+
+.arrow {
+  font-size: 24px;
+  color: #28a745;
+  font-weight: bold;
+  user-select: none;
+  align-self: center;
+  margin-top: -2px;
+}
+
+.nullWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: flex-start;
+}
+
+.pointerLabelNull {
+  font-size: 13px;
+  font-family: monospace;
+  font-weight: bold;
+  color: #6c757d;
+}
+
+.nullPointer {
+  font-weight: bold;
+  color: #dc3545;
+  padding: 12px 20px;
+  border: 2px dashed #dc3545;
+  border-radius: 6px;
+  margin-top: 5px;
+}
