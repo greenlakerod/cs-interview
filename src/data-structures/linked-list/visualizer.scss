@@ -58,12 +58,13 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 15px;
-  max-width: 100%;
+  // max-width: 100%;
   padding: 40px 20px;
   background: white;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0,0,0,0.05);
   min-height: 180px;
+  width: 100%;
 }
 
 .nodeWrapper {

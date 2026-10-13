@@ -1,13 +1,11 @@
 import React from "react";
 import { LinkedList } from ".";
 import styles from "./visualizer.scss";
+import ButtonWithMenu from "@src/components/ButtonWithMenu";
+import "@blueprintjs/core/lib/css/blueprint.css";
+import { Button, FormGroup, InputGroup, NumericInput } from "@blueprintjs/core/lib/esm";
 
-// enum ListOperation {
-//   Insert = "insert",
-//   Remove = "remove",
-// }
-
-enum InsertOperation {
+enum InsertDeleteOperation {
   Head = "head",
   Tail = "tail",
   Index = "index",
@@ -59,10 +57,7 @@ const InsertionControls: React.FC<InsertionControlsProps> = (
   const [insertValue, setInsertValue] = React.useState(10);
   const [insertIndex, setInsertIndex] = React.useState(0);
 
-  const updateValueInput = (e: React.ChangeEvent<HTMLInputElement>): void => setInsertValue(parseInt(e.target.value));
-  const updateIndexInput = (e: React.ChangeEvent<HTMLInputElement>): void => setInsertIndex(parseInt(e.target.value));
-
-  const executeInsertion = (insertionType: InsertOperation) => {
+  const executeInsertion = (insertionType: InsertDeleteOperation) => {
     const numericValue = Number(insertValue);
     if (isNaN(numericValue)) {
       alert("Please enter a valid numeric value");
@@ -71,13 +66,13 @@ const InsertionControls: React.FC<InsertionControlsProps> = (
 
     try {
       switch (insertionType) {
-        case InsertOperation.Head:
+        case InsertDeleteOperation.Head:
           linkedList.current.addFirst(numericValue);
           break;
-        case InsertOperation.Tail:
+        case InsertDeleteOperation.Tail:
           linkedList.current.addLast(numericValue);
           break;
-        case InsertOperation.Index:
+        case InsertDeleteOperation.Index:
           linkedList.current.add(numericValue, insertIndex);
         default:
           break;
@@ -87,36 +82,90 @@ const InsertionControls: React.FC<InsertionControlsProps> = (
         setListData(linkedList.current.values);
       }
     } catch (err) {
-      console.error("Memory reference layout failure: ", err);
+      console.error("Failure: ", err);
     }
+  };
+
+  const executeDeletion = (deletionType: InsertDeleteOperation) => {
+    try {
+      switch (deletionType) {
+        case InsertDeleteOperation.Head:
+          linkedList.current.removeFirst();
+          break;
+        case InsertDeleteOperation.Tail:
+          linkedList.current.removeLast();
+          break;
+        case InsertDeleteOperation.Index:
+        default:
+          linkedList.current.remove(insertIndex);
+          break;
+      }
+
+      if (linkedList.current) {
+        setListData(linkedList.current.values);
+      }
+    } catch (err) {
+      console.error("Failure: ", err);
+    }
+  };
+
+  const executeReverse = () => {
+    try {
+      linkedList.current.reverse();
+      if (linkedList.current) {
+        setListData(linkedList.current.values);
+      }
+    }
+    catch (err) { console.error("Failure: ", err); }    
+  };
+
+  const executeClear = () => {
+    try {
+      linkedList.current.clear();
+      if (linkedList.current) {
+        setListData(linkedList.current.values);
+      }
+    }
+    catch (err) { console.error("Failure: ", err); }    
   };
 
   return (
     <React.Fragment>
-      <div className={styles.inputGroup}>
-        <label className={styles.label}>Value</label>
-        <input 
-          type="number" 
-          value={insertValue} 
-          onChange={updateValueInput} 
-          className={styles.input}
+      <FormGroup label="Value">
+        <NumericInput 
+          value={insertValue}
+          onValueChange={(v) => setInsertValue(v)}
         />
-      </div>
-      
-      <div className={styles.inputGroup}>
-        <label className={styles.label}>Index</label>
-        <input 
-          type="number" 
-          value={insertIndex} 
-          min="0"
-          onChange={updateIndexInput} 
-          className={styles.input}
+      </FormGroup>
+      <FormGroup label="Index">
+        <NumericInput 
+          value={insertIndex}
+          onValueChange={(v) => setInsertIndex(v)}
+          min={0}
         />
-      </div>
-
-      <button onClick={() => executeInsertion(InsertOperation.Head)} className={styles.button}>Insert Head</button>
-      <button onClick={() => executeInsertion(InsertOperation.Tail)} className={styles.button}>Insert Tail</button>
-      <button onClick={() => executeInsertion(InsertOperation.Index)} className={styles.button}>Insert At Index</button>
+      </FormGroup>
+      <ButtonWithMenu
+        text="Insert at"
+        menuItems={[
+          { text: "Head", onClick: () => executeInsertion(InsertDeleteOperation.Head) },
+          { text: "Tail", onClick: () => executeInsertion(InsertDeleteOperation.Tail) },
+          { text: "Index", onClick: () => executeInsertion(InsertDeleteOperation.Index) },
+        ]}
+      />
+      <ButtonWithMenu
+        text="Delete at"
+        menuItems={[
+          { text: "Head", onClick: () => executeDeletion(InsertDeleteOperation.Head) },
+          { text: "Tail", onClick: () => executeDeletion(InsertDeleteOperation.Tail) },
+          { text: "Index", onClick: () => executeDeletion(InsertDeleteOperation.Index) },
+        ]}
+      />
+      <Button intent="primary" onClick={executeReverse}>
+        Reverse
+      </Button>
+      <Button intent="primary" onClick={executeClear}>
+        Clear
+      </Button>
     </React.Fragment>
   );
 };
@@ -124,12 +173,10 @@ const InsertionControls: React.FC<InsertionControlsProps> = (
 const LinkedListVisualizer: React.FC = () => {
   const linkedList = React.useRef(new LinkedList<number>());
   const [listData, setListData] = React.useState<number[]>([]);
-  // const [listOperationInputValue, setListOperationInputValue] = React.useState<ListOperation>(ListOperation.Insert);
 
   return (
     <div className={styles.container}>
-      {/* Control Panel Section */}
-      <div className={styles.controls}>
+      <div className={styles.controls} style={{ width: "100%" }}>
         <InsertionControls {...{ linkedList, setListData }} />
       </div>
 
