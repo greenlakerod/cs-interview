@@ -1,4 +1,4 @@
-import { LinkedList, LinkedListNode } from "../linked-list";
+import { LinkedList, LinkedListNode } from "../linked-list/LinkedList";
 
 export class LRUCache<T> {
   private _capacity: number;

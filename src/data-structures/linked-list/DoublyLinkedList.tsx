@@ -1,4 +1,4 @@
-import { LinkedList, LinkedListNode } from ".";
+import { LinkedList, LinkedListNode } from "./LinkedList";
 
 export default class DoublyLinkedList<T> extends LinkedList<T> {
   public addNode(node: LinkedListNode<T>, index?: number): boolean {
@@ -224,7 +224,7 @@ export default class DoublyLinkedList<T> extends LinkedList<T> {
   public reverse(
     // node: LinkedListNode<T> | null | undefined = this._head
   ): LinkedListNode<T> | null | undefined {
-    if (this._count <= 1 || !this._head || !this._tail) return null;
+    if (this._count <= 1 || !this._head || !this._tail) return this._head; // return null;
 
     // If the list is empty or has only one node,
     // return the head as is
@@ -291,5 +291,34 @@ export default class DoublyLinkedList<T> extends LinkedList<T> {
     // // }
 
     // // return this.reverse(node.prev);
+  }
+
+  public getNode(index: number): LinkedListNode<T> | null {
+    if (!this._count || (index >= this._count) || (index < 0) || !this._head || !this._tail) return null;
+
+    let current: LinkedListNode<T> | null | undefined;
+    let i: number;
+
+    if (index > this._count / 2) {
+      current = this._tail;
+      i = this._count - 1;
+
+      while (current) {
+        if (i === index) return current;
+        current = current.prev;
+        i--;
+      }
+    } else {
+      current = this._head;
+      i = 0;
+
+      while (current) {
+        if (i === index) return current;
+        current = current.next;
+        i++;
+      }
+    }
+
+    return null;
   }
 }
