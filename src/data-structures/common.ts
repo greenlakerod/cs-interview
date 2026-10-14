@@ -1,5 +1,5 @@
 export interface IComparable<T> {
-  compareTo: (value: T) => number;
+  // compareTo: (value: T) => number;
 }
 
 export interface INode<T> extends IComparable<T> {

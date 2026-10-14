@@ -1,9 +1,11 @@
 import React from "react";
-import { LinkedList } from ".";
+import { ILinkedList, LinkedList } from ".";
 import styles from "./visualizer.scss";
 import ButtonWithMenu from "@src/components/ButtonWithMenu";
 import "@blueprintjs/core/lib/css/blueprint.css";
-import { Button, FormGroup, InputGroup, NumericInput } from "@blueprintjs/core/lib/esm";
+import { Button, FormGroup, InputGroup, MenuItem, NumericInput } from "@blueprintjs/core/lib/esm";
+import { Select } from "@blueprintjs/select/lib/esm";
+import DoublyLinkedList from "./DoublyLinkedList";
 
 enum InsertDeleteOperation {
   Head = "head",
@@ -11,14 +13,20 @@ enum InsertDeleteOperation {
   Index = "index",
 }
 
+enum LinkedListType {
+  Standard = "standard",
+  Double = "double"
+}
+
 interface NodeProps {
   index: number;
   value: any;
   isHead: boolean;
   isTail: boolean;
+  type: LinkedListType;
 }
 
-const Node: React.FC<NodeProps> = ({ index, value, isHead, isTail }: NodeProps) => (
+const Node: React.FC<NodeProps> = ({ index, value, isHead, isTail, type }: NodeProps) => (
   <React.Fragment key={index}>
     {/* Node Container containing labels + structural node box */}
     <div className={styles.nodeWrapper}>
@@ -26,6 +34,11 @@ const Node: React.FC<NodeProps> = ({ index, value, isHead, isTail }: NodeProps) 
       {isHead && <div className={styles.headPointerTag}>HEAD ⬇</div>}
       
       <div className={styles.node}>
+        { type === LinkedListType.Double && (
+          <div className={styles.nodePrev}>
+            {isHead ? 'NULL' : '•prev'}
+          </div>          
+        )}
         <div className={styles.nodeData}>{value}</div>
         <div className={styles.nodeNext}>
           {isTail ? 'NULL' : '•next'}
@@ -38,23 +51,27 @@ const Node: React.FC<NodeProps> = ({ index, value, isHead, isTail }: NodeProps) 
     
     {/* Connected structural arrow */}
     {!isTail && (
-      <div className={styles.arrow}>➔</div>
+      <div className={styles.arrow}>{type === LinkedListType.Standard ? "➔" : "⇄"}</div>
     )}
   </React.Fragment>  
 );
 
-interface InsertionControlsProps {
-  linkedList: React.MutableRefObject<LinkedList<number>>;
+interface ListControlsProps {
+  linkedList: React.MutableRefObject<ILinkedList<number>>;
+  selectedListType: LinkedListType;
+  setSelectedListType: React.Dispatch<React.SetStateAction<LinkedListType>>;
   setListData: React.Dispatch<React.SetStateAction<number[]>>;
 }
 
-const InsertionControls: React.FC<InsertionControlsProps> = (
+const ListControls: React.FC<ListControlsProps> = (
   {
     linkedList,
+    selectedListType,
+    setSelectedListType,
     setListData,
-  }: InsertionControlsProps,
+  }: ListControlsProps,
 ) => {
-  const [insertValue, setInsertValue] = React.useState(10);
+  const [insertValue, setInsertValue] = React.useState(1);
   const [insertIndex, setInsertIndex] = React.useState(0);
 
   const executeInsertion = (insertionType: InsertDeleteOperation) => {
@@ -79,7 +96,7 @@ const InsertionControls: React.FC<InsertionControlsProps> = (
       }
 
       if (linkedList.current) {
-        setListData(linkedList.current.values);
+        setListData(linkedList.current.values ?? []);
       }
     } catch (err) {
       console.error("Failure: ", err);
@@ -102,7 +119,7 @@ const InsertionControls: React.FC<InsertionControlsProps> = (
       }
 
       if (linkedList.current) {
-        setListData(linkedList.current.values);
+        setListData(linkedList.current.values ?? []);
       }
     } catch (err) {
       console.error("Failure: ", err);
@@ -113,7 +130,7 @@ const InsertionControls: React.FC<InsertionControlsProps> = (
     try {
       linkedList.current.reverse();
       if (linkedList.current) {
-        setListData(linkedList.current.values);
+        setListData(linkedList.current.values ?? []);
       }
     }
     catch (err) { console.error("Failure: ", err); }    
@@ -123,14 +140,42 @@ const InsertionControls: React.FC<InsertionControlsProps> = (
     try {
       linkedList.current.clear();
       if (linkedList.current) {
-        setListData(linkedList.current.values);
+        setListData(linkedList.current.values ?? []);
       }
     }
     catch (err) { console.error("Failure: ", err); }    
   };
 
+  const listTypes = Object.entries(LinkedListType).map(([key, linkedListType]) => ({ label: key, value: linkedListType }));
+  
   return (
     <React.Fragment>
+      <FormGroup label="Linked List">
+        <Select 
+          activeItem={listTypes.find(i => i.value === selectedListType)}
+          items={listTypes} 
+          itemRenderer={(listType, { handleClick, handleFocus, modifiers, query }) => {
+            if (!modifiers.matchesPredicate) {
+                return null;
+            }
+            return (
+                <MenuItem
+                  active={modifiers.active}
+                  disabled={modifiers.disabled}
+                  key={listType.value}
+                  label={listType.value.toString()}
+                  onClick={handleClick}
+                  onFocus={handleFocus}
+                  roleStructure="listoption"
+                  text={listType.label}
+                />
+            );
+          }} 
+          onItemSelect={({ value }) => setSelectedListType(value)} 
+        >
+          <Button text={listTypes.find(i => i.value === selectedListType)?.label ?? "Select a linked list type"} endIcon="caret-down" />
+        </Select>
+      </FormGroup>
       <FormGroup label="Value">
         <NumericInput 
           value={insertValue}
@@ -171,13 +216,20 @@ const InsertionControls: React.FC<InsertionControlsProps> = (
 };
 
 const LinkedListVisualizer: React.FC = () => {
+  const [selectedListType, setSelectedListType] = React.useState<LinkedListType>(LinkedListType.Standard);
   const linkedList = React.useRef(new LinkedList<number>());
   const [listData, setListData] = React.useState<number[]>([]);
+
+  React.useEffect(() => {
+    linkedList.current = selectedListType === LinkedListType.Standard
+      ? new LinkedList<number>()
+      : new DoublyLinkedList<number>();
+  }, [selectedListType]);
 
   return (
     <div className={styles.container}>
       <div className={styles.controls} style={{ width: "100%" }}>
-        <InsertionControls {...{ linkedList, setListData }} />
+        <ListControls {...{ linkedList, selectedListType, setSelectedListType, setListData }} />
       </div>
 
       {/* Visual Canvas Section */}
@@ -195,6 +247,7 @@ const LinkedListVisualizer: React.FC = () => {
               value, 
               isHead: index === 0, 
               isTail: index === listData.length - 1,
+              type: selectedListType,
             }} />
           ))
         )}
