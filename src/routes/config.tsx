@@ -6,6 +6,7 @@ import { Navigate, RouteObject } from "react-router-dom";
 // import { MobxTimerPage } from "@/views/Mobx";
 import Homepage from "@src/Homepage";
 import LinkedListVisualizer from "@src/data-structures/linked-list/visualizer";
+import LRUCacheVisualizer from "@src/data-structures/lru-cache/visualizer";
 
 export const useRoutesConfig = () => {
   const routes: RouteObject[] = [
@@ -15,7 +16,11 @@ export const useRoutesConfig = () => {
     },
     {
       path: "/linked-list",
-      element: <LinkedListVisualizer />
+      element: <LinkedListVisualizer />,
+    },
+    {
+      path: "/lru-cache",
+      element: <LRUCacheVisualizer />,
     },
     // {
     //   path: "mobx",

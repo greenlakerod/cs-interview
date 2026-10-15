@@ -6,7 +6,8 @@ import "@blueprintjs/core/lib/css/blueprint.css";
 import { Button, FormGroup, InputGroup, MenuItem, NumericInput, Tooltip } from "@blueprintjs/core/lib/esm";
 import { Select } from "@blueprintjs/select/lib/esm";
 import DoublyLinkedList from "./DoublyLinkedList";
-import { LinkedList, LinkedListNode } from "./LinkedList";
+import * as ds from "./LinkedList";
+
 
 enum InsertDeleteOperation {
   Head = "head",
@@ -14,39 +15,97 @@ enum InsertDeleteOperation {
   Index = "index",
 }
 
-enum LinkedListType {
+export enum LinkedListType {
   Standard = "standard",
   Double = "double"
 }
 
-interface NodeProps {
+export interface LinkedNodeProps<T> {
+  headPtrLabel?: string;
   index: number;
-  node: LinkedListNode<number> | null;
   isHead: boolean;
   isTail: boolean;
+  node: ds.LinkedListNode<T> | null;
   type: LinkedListType;
+  showKey?: boolean;
+  showValue?: boolean;
+  tailPtrLabel?: string;
 }
 
-interface ListControlsProps {
+interface LinkedListControlsProps {
   linkedList: React.MutableRefObject<ILinkedList<number>>;
   selectedListType: LinkedListType;
   setSelectedListType: React.Dispatch<React.SetStateAction<LinkedListType>>;
-  setListData: React.Dispatch<React.SetStateAction<Array<LinkedListNode<number> | null>>>;
+  setListData: React.Dispatch<React.SetStateAction<Array<ds.LinkedListNode<number> | null>>>;
 }
 
-const Node: React.FC<NodeProps> = ({ index, node, isHead, isTail, type }: NodeProps) => {
+export interface LinkedListCanvasProps<T> {
+  headPtrLabel?: string;
+  listNodes: Array<ds.LinkedListNode<T> | null>;
+  selectedListType: LinkedListType;
+  showKeys?: boolean;
+  showValues?: boolean;
+  tailPtrLabel?: string;
+}
+
+export function LinkedListNode<T>({
+  headPtrLabel = "HEAD",
+  index, 
+  isHead, 
+  isTail, 
+  node,
+  showKey,
+  showValue = true,
+  type,
+  tailPtrLabel = "TAIL",
+}: LinkedNodeProps<T>) {
+  const renderLabel = () => {
+    let label = "";
+    if (showValue) label = `${node?.value}`;
+    if (showKey) {
+      if (label) label = `${node?.key ?? "NO KEY"} (${label})`;
+      else label = `${node?.key}`;
+    }
+    if (!label) label = "NO DATA";
+
+    let content = (
+      <div className={styles.nodeData}>{label}</div>
+    );
+
+    if (showKey && showValue) {
+      content = (
+        <Tooltip
+          content={`Key: ${node?.key}, Value: ${node?.value}`}
+          placement="bottom-start"
+        >
+          {content}
+        </Tooltip>
+      );
+    }
+
+    return content;
+  };
+
+  const renderPtrLabel = (n?: ds.LinkedListNode<T> | null) => {
+    let label = "";
+    if (showValue) label = `${n?.value}`;
+    if (showKey) {
+      if (label) label = `[Key: ${n?.key ?? "NO KEY"}, Value: ${label}]`;
+      else label = `${n?.key}`;
+    }
+    if (!label) label = "NO DATA";
+  };
 
   return (
     <React.Fragment key={index}>
       {/* Node Container containing labels + structural node box */}
       <div className={styles.nodeWrapper}>
         {/* Floating Pointer Head Indicator */}
-        {isHead && <div className={styles.headPointerTag}>HEAD ⬇</div>}
-        
+        {isHead && <div className={styles.headPointerTag}>{`${headPtrLabel} ⬇`}</div>}
         <div className={styles.node}>
           { type === LinkedListType.Double && (
             <Tooltip 
-              content={isHead ? 'prev: NULL' : `prev: ${node?.prev?.value}`}
+              content={isHead ? 'prev: NULL' : `prev: ${renderPtrLabel(node?.prev)}`}
               placement="bottom-start"
             >
               <div className={styles.nodePrev}>
@@ -54,19 +113,19 @@ const Node: React.FC<NodeProps> = ({ index, node, isHead, isTail, type }: NodePr
               </div>
             </Tooltip>        
           )}
-          <div className={styles.nodeData}>{node?.value}</div>
-            <Tooltip 
-              content={isTail ? 'next: NULL' : `next: ${node?.next?.value}`}
-              placement="bottom-start"
-            >
-              <div className={styles.nodeNext}>
-                {isTail ? 'NULL' : '•'}
-              </div>
-            </Tooltip>
+          {renderLabel()}
+          <Tooltip 
+            content={isTail ? 'next: NULL' : `next: ${renderPtrLabel(node?.next)}`}
+            placement="bottom-start"
+          >
+            <div className={styles.nodeNext}>
+              {isTail ? 'NULL' : '•'}
+            </div>
+          </Tooltip>
         </div>
 
         {/* Floating Pointer Tail Indicator */}
-        {isTail && <div className={styles.tailPointerTag}>⬆ TAIL</div>}
+        {isTail && <div className={styles.tailPointerTag}>{`⬆ ${tailPtrLabel}`}</div>}
       </div>
       
       {/* Connected structural arrow */}
@@ -75,16 +134,14 @@ const Node: React.FC<NodeProps> = ({ index, node, isHead, isTail, type }: NodePr
       )}
     </React.Fragment>  
   );
-};
+}
 
-const ListControls: React.FC<ListControlsProps> = (
-  {
-    linkedList,
-    selectedListType,
-    setSelectedListType,
-    setListData,
-  }: ListControlsProps,
-) => {
+const LinkedListControls: React.FC<LinkedListControlsProps> = ({
+  linkedList,
+  selectedListType,
+  setSelectedListType,
+  setListData,
+}: LinkedListControlsProps) => {
   const [insertValue, setInsertValue] = React.useState(1);
   const [insertIndex, setInsertIndex] = React.useState(0);
 
@@ -167,7 +224,7 @@ const ListControls: React.FC<ListControlsProps> = (
   const listTypes = Object.entries(LinkedListType).map(([key, linkedListType]) => ({ label: key, value: linkedListType }));
   
   return (
-    <React.Fragment>
+    <div className={styles.controls} style={{ width: "100%" }}>
       <FormGroup label="Linked List">
         <Select 
           activeItem={listTypes.find(i => i.value === selectedListType)}
@@ -229,49 +286,54 @@ const ListControls: React.FC<ListControlsProps> = (
       <Button intent="primary" onClick={executeClear}>
         Clear
       </Button>
-    </React.Fragment>
+    </div>
   );
 };
 
+export function LinkedListCanvas<T>({ 
+  listNodes = [], 
+  selectedListType,
+}: LinkedListCanvasProps<T>) {
+  return (
+    <div className={styles.visualContainer}>
+      {listNodes.length === 0 ? (
+        <div className={styles.nullWrapper}>
+          <div className={styles.pointerLabelNull}>HEAD ➔ NULL</div>
+          <div className={styles.pointerLabelNull}>TAIL ➔ NULL</div>
+          <div className={styles.nullPointer}>Empty List</div>
+        </div>
+      ) : (
+        listNodes.map((node: ds.LinkedListNode<T> | null, index: number) => (
+          <LinkedListNode {...{ 
+            index, 
+            node, 
+            isHead: index === 0, 
+            isTail: index === listNodes.length - 1,
+            key: index,
+            type: selectedListType,
+          }} />
+        ))
+      )}
+    </div>
+  );
+}
+
 const LinkedListVisualizer: React.FC = () => {
   const [selectedListType, setSelectedListType] = React.useState<LinkedListType>(LinkedListType.Standard);
-  const linkedList = React.useRef(new LinkedList<number>());
-  const [listData, setListData] = React.useState<Array<LinkedListNode<number> | null>>([]);
+  const linkedList = React.useRef(new ds.LinkedList<number>());
+  const [listData, setListData] = React.useState<Array<ds.LinkedListNode<number> | null>>([]);
 
   React.useEffect(() => {
     linkedList.current = selectedListType === LinkedListType.Standard
-      ? new LinkedList<number>()
+      ? new ds.LinkedList<number>()
       : new DoublyLinkedList<number>();
     setListData([]);
   }, [selectedListType]);
 
   return (
     <div className={styles.container}>
-      <div className={styles.controls} style={{ width: "100%" }}>
-        <ListControls {...{ linkedList, selectedListType, setSelectedListType, setListData }} />
-      </div>
-
-      {/* Visual Canvas Section */}
-      <div className={styles.visualContainer}>
-        {listData.length === 0 ? (
-          <div className={styles.nullWrapper}>
-            <div className={styles.pointerLabelNull}>HEAD ➔ NULL</div>
-            <div className={styles.pointerLabelNull}>TAIL ➔ NULL</div>
-            <div className={styles.nullPointer}>Empty List</div>
-          </div>
-        ) : (
-          listData.map((node: LinkedListNode<number> | null, index: number) => (
-            <Node {...{ 
-              index, 
-              node, 
-              isHead: index === 0, 
-              isTail: index === listData.length - 1,
-              key: index,
-              type: selectedListType,
-            }} />
-          ))
-        )}
-      </div>
+      <LinkedListControls {...{ linkedList, selectedListType, setSelectedListType, setListData }} />
+      <LinkedListCanvas {...{ listNodes: listData, selectedListType }} />
     </div>
   );
 };

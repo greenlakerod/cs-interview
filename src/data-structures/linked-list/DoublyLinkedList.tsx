@@ -9,6 +9,7 @@ export default class DoublyLinkedList<T> extends LinkedList<T> {
         this._head.prev = node;
       }
       this._head = node;
+      this._head.prev = null;
 
       if (this._tail === null) {
         this._tail = this._head;
@@ -25,6 +26,7 @@ export default class DoublyLinkedList<T> extends LinkedList<T> {
         node.prev = this._tail;
       }
       this._tail = node;
+      this._tail.next = null;
       this._count++;
 
       return true;
