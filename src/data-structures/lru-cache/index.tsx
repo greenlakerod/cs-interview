@@ -69,6 +69,7 @@ export class LRUCache<T> {
       const newNode = new LinkedListNode<T>(value);
       newNode.key = key;
 
+      // remove tail if necessary prior to adding entry
       if (keys.length >= this._capacity) {
         this.removeTail();
       }

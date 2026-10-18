@@ -94,6 +94,7 @@ export function LinkedListNode<T>({
       else label = `${n?.key}`;
     }
     if (!label) label = "NO DATA";
+    return label;
   };
 
   return (
@@ -293,6 +294,8 @@ const LinkedListControls: React.FC<LinkedListControlsProps> = ({
 export function LinkedListCanvas<T>({ 
   listNodes = [], 
   selectedListType,
+  showKeys,
+  showValues,
 }: LinkedListCanvasProps<T>) {
   return (
     <div className={styles.visualContainer}>
@@ -310,6 +313,8 @@ export function LinkedListCanvas<T>({
             isHead: index === 0, 
             isTail: index === listNodes.length - 1,
             key: index,
+            showKey: showKeys,
+            showValue: showValues,
             type: selectedListType,
           }} />
         ))
@@ -333,7 +338,7 @@ const LinkedListVisualizer: React.FC = () => {
   return (
     <div className={styles.container}>
       <LinkedListControls {...{ linkedList, selectedListType, setSelectedListType, setListData }} />
-      <LinkedListCanvas {...{ listNodes: listData, selectedListType }} />
+      <LinkedListCanvas {...{ selectedListType, listNodes: listData, showValues: true }} />
     </div>
   );
 };
