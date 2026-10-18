@@ -325,4 +325,12 @@ export class LinkedList<T> implements ILinkedList<T> {
   }
 
   // sort: (descending?: boolean) => void;
+
+  public copyTo(array: Array<T>, arrayIndex: number = 0): void {
+    let current: LinkedListNode<T> | null | undefined = this._head;
+    while (current != null) {
+      array[arrayIndex++] = current.value;
+      current = current.next;
+    }    
+  }
 }

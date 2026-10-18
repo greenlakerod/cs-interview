@@ -27,7 +27,7 @@ export interface ILinkedList<T> {
 
   clear: () => boolean;
   contains: (value: T) => boolean;
-  // copyTo: (array: Array<any>, arrayIndex?: number) => void;
+  copyTo: (array: Array<any>, arrayIndex?: number) => void;
   reverse: (node?: ILinkedListNode<T>) => ILinkedListNode<T> | null | undefined;
   // sort: (descending?: boolean) => void;
 }
