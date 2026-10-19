@@ -7,6 +7,7 @@ import { Navigate, RouteObject } from "react-router-dom";
 import Homepage from "@src/Homepage";
 import LinkedListVisualizer from "@src/data-structures/linked-list/visualizer";
 import LRUCacheVisualizer from "@src/data-structures/lru-cache/visualizer";
+import BinaryTreeVisualizer from "@src/data-structures/trees/binary-tree/visualizer";
 
 export const useRoutesConfig = () => {
   const routes: RouteObject[] = [
@@ -21,6 +22,10 @@ export const useRoutesConfig = () => {
     {
       path: "/lru-cache",
       element: <LRUCacheVisualizer />,
+    },
+    {
+      path: "/binary-tree",
+      element: <BinaryTreeVisualizer />,
     },
     // {
     //   path: "mobx",

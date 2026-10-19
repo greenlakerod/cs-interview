@@ -63,7 +63,7 @@ const Controls: React.FC<ControlsProps> = ({
 }) => {
   return (
     <div className={styles.controls} style={{ width: "100%" }}>
-       <FormGroup label="Capacity">
+      <FormGroup label="Capacity">
         <NumericInput 
           value={capacityValue}
           onValueChange={(v) => setCapacityValue(v)}
