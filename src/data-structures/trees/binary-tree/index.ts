@@ -1,15 +1,8 @@
 import { INode } from "@src/data-structures/common";
-import { LinkedListStack } from "@src/data-structures/stack/linked-list-stack";
-// import { BinaryTreeNode, IBinaryTreeNode } from "./binary-tree-node";
+// import { LinkedListStack } from "@src/data-structures/stack/linked-list-stack";
+import { InOrderSerializer, IStaticSerializer, LevelOrderSerializer, PostOrderSerializer, PreOrderSerializer, TreeTraversal } from "./serializer";
 
 export type NodeValueComparer<T> = (v1: T, v2: T) => number;
-
-export enum TreeTraversal {
-  InOrder = "inorder",
-  PreOrder = "preorder",
-  PostOrder = "postorder",
-  LevelOrder = "levelorder",
-}
 
 export interface IBinaryTreeNode<T> extends INode<T> {
   value: T;
@@ -30,8 +23,12 @@ export interface IBinaryTree<T> {
   remove: (value: T) => void;
   find: (value: T) => IBinaryTreeNode<T> | null;
   clear: () => void;
-  traverse: (order: TreeTraversal, nodes: Array<any>, recursive?: boolean) => void;
-  buildTree: (order: TreeTraversal, nodes: Array<any>, levelOrderNodes?: Array<any>) => void;
+
+  // serialize: (order: TreeTraversal, nodes: Array<any>, recursive?: boolean) => void;
+  serialize: (order: TreeTraversal, recursive?: boolean) => string;
+  
+  // deserialize: (order: TreeTraversal, nodes: Array<any>, levelOrderNodes?: Array<any>) => void;
+  deserialize: (order: TreeTraversal, data: string, recursive?: boolean) => void;
   // compareNodes: (v1: T, v2: T, fn: (v1: T, v2: T) => number) => number;
 }
 
@@ -89,25 +86,60 @@ export abstract class BinaryTree<T> implements IBinaryTree<T> {
   public abstract add(value: T): void;
   public abstract remove(value: T): void;
   public abstract find(value: T): BinaryTreeNode<T> | null;
-  public abstract buildTree(order: TreeTraversal, nodes: Array<any>, levelOrderNodes?: Array<any>): void;
+
+  // public abstract deserialize(order: TreeTraversal, nodes: Array<any>, levelOrderNodes?: Array<any>): void;
+  public deserialize(order: TreeTraversal, data: string, recursive?: boolean): void {
+    let serializer: IStaticSerializer;
+
+    switch (order) {
+      case TreeTraversal.InOrder:
+        serializer = InOrderSerializer; break;
+      case TreeTraversal.LevelOrder:
+        serializer = LevelOrderSerializer; break;
+      case TreeTraversal.PostOrder:
+        serializer = PostOrderSerializer; break;
+      case TreeTraversal.PreOrder:
+      default:
+        serializer = PreOrderSerializer; break;
+    }
+
+    this._root = serializer.deserialize(data, recursive);    
+  }
 
   // depth first: http://www.geeksforgeeks.org/tree-traversals-inorder-preorder-and-postorder/
   // breadth first: http://www.geeksforgeeks.org/?p=2686
-  public traverse(order: TreeTraversal, nodes: Array<T>, recursive: boolean = true): void {
-    let fn: ((node: BinaryTreeNode<T> | null, nodes: Array<T>, recursive: boolean) => void) | undefined = undefined;
+  // public serialize(order: TreeTraversal, nodes: Array<T>, recursive: boolean = true): void {
+  //   let fn: ((node: BinaryTreeNode<T> | null, nodes: Array<T>, recursive: boolean) => void) | undefined = undefined;
+
+  //   switch (order) {
+  //     case TreeTraversal.InOrder: fn = this.serializeInOrder; break;
+  //     case TreeTraversal.PreOrder: fn = this.serializePreOrder; break;
+  //     case TreeTraversal.PostOrder: fn = this.serializePostOrder; break;
+  //     case TreeTraversal.LevelOrder: fn = this.serializeLevelOrder; break;
+  //     default: break;
+  //   }
+
+  //   if (fn !== undefined) {
+  //     fn.call(this, this._root, nodes, recursive);
+  //     console.log(`traversal (${order}): ${nodes}`);
+  //   }
+  // }
+  public serialize(order: TreeTraversal, recursive?: boolean): string {
+    let serializer: IStaticSerializer;
 
     switch (order) {
-      case TreeTraversal.InOrder: fn = this.traverseInOrder; break;
-      case TreeTraversal.PreOrder: fn = this.traversePreOrder; break;
-      case TreeTraversal.PostOrder: fn = this.traversePostOrder; break;
-      case TreeTraversal.LevelOrder: fn = this.traverseLevelOrder; break;
-      default: break;
+      case TreeTraversal.InOrder:
+        serializer = InOrderSerializer; break;
+      case TreeTraversal.LevelOrder:
+        serializer = LevelOrderSerializer; break;
+      case TreeTraversal.PostOrder:
+        serializer = PostOrderSerializer; break;
+      case TreeTraversal.PreOrder:
+      default:
+        serializer = PreOrderSerializer; break;
     }
 
-    if (fn !== undefined) {
-      fn.call(this, this._root, nodes, recursive);
-      console.log(`traversal (${order}): ${nodes}`);
-    }
+    return serializer.serialize(this.root, recursive);
   }
 
   public clear(): void {
@@ -133,105 +165,109 @@ export abstract class BinaryTree<T> implements IBinaryTree<T> {
   //   return fn(v1, v2);
   // }
 
-  protected traverseInOrder(node: BinaryTreeNode<T> | null, output: Array<T>, recursive: boolean): void {
-    if (node) {
-      if (recursive) {
-        this.traverseInOrder(node.left, output, recursive);
-        output.push(node.value);
-        this.traverseInOrder(node.right, output, recursive);
-      } else {
-        let stack: LinkedListStack<BinaryTreeNode<T>> = new LinkedListStack<BinaryTreeNode<T>>();
-        let n: BinaryTreeNode<T> | null | undefined = node;
+  // protected serializeInOrder(node: BinaryTreeNode<T> | null, output: Array<T>, recursive: boolean): void {
+  //   if (node) {
+  //     if (recursive) {
+  //       this.serializeInOrder(node.left, output, recursive);
+  //       output.push(node.value);
+  //       this.serializeInOrder(node.right, output, recursive);
+  //     } else {
+  //       let stack: LinkedListStack<BinaryTreeNode<T>> = new LinkedListStack<BinaryTreeNode<T>>();
+  //       let n: BinaryTreeNode<T> | null | undefined = node;
 
-        do {
-          while (n) {
-            stack.push(n);
-            n = n.left;
-          }
-          if (stack.size > 0) {
-            n = stack.pop();
-            output.push(n?.value as T);
+  //       do {
+  //         while (n) {
+  //           stack.push(n);
+  //           n = n.left;
+  //         }
+  //         if (stack.size > 0) {
+  //           n = stack.pop();
+  //           output.push(n?.value as T);
 
-            n = n?.right;
-          }
-        } while (stack.size > 0 || n);
-      }
-    }
-  }
+  //           n = n?.right;
+  //         }
+  //       } while (stack.size > 0 || n);
+  //     }
+  //   }
+  // }
 
-  protected traversePreOrder(node: BinaryTreeNode<T> | null, output: Array<T>, recursive: boolean): void {
-    if (node) {
-      if (recursive) {
-        output.push(node.value);
-        this.traversePreOrder(node.left, output, recursive);
-        this.traversePreOrder(node.right, output, recursive);
-      } else {
-        let stack: LinkedListStack<BinaryTreeNode<T>> = new LinkedListStack<BinaryTreeNode<T>>();
-        let n: BinaryTreeNode<T> | null | undefined = node;
+  // protected serializePreOrder(
+  //   node: BinaryTreeNode<T> | null, 
+  //   output: Array<T>, 
+  //   recursive: boolean,
+  // ): void {
+  //   if (node) {
+  //     if (recursive) {
+  //       output.push(node.value);
+  //       this.serializePreOrder(node.left, output, recursive);
+  //       this.serializePreOrder(node.right, output, recursive);
+  //     } else {
+  //       let stack: LinkedListStack<BinaryTreeNode<T>> = new LinkedListStack<BinaryTreeNode<T>>();
+  //       let n: BinaryTreeNode<T> | null | undefined = node;
 
-        do {
-          while (n) {
-            stack.push(n);
-            output.push(n.value);
+  //       do {
+  //         while (n) {
+  //           stack.push(n);
+  //           output.push(n.value);
 
-            n = n.left;
-          }
-          if (stack.size > 0) {
-            n = stack.pop();
-            n = n?.right;
-          }
-        } while (stack.size > 0 || n);
-      }
-    }
-  }
+  //           n = n.left;
+  //         }
+  //         if (stack.size > 0) {
+  //           n = stack.pop();
+  //           n = n?.right;
+  //         }
+  //       } while (stack.size > 0 || n);
+  //     }
+  //   }
+  // }
 
-  protected traversePostOrder(node: BinaryTreeNode<T> | null, output: Array<T>, recursive: boolean): void {
-    if (node) {
-      if (recursive) {
-        this.traversePostOrder(node.left, output, recursive);
-        this.traversePostOrder(node.right, output, recursive);
-        output.push(node.value);
-      } else {
-        let stack: LinkedListStack<BinaryTreeNode<T>> = new LinkedListStack<BinaryTreeNode<T>>();
-        let n: BinaryTreeNode<T> | null | undefined = node;
-        let prev: BinaryTreeNode<T> | null | undefined;
+  // protected serializePostOrder(node: BinaryTreeNode<T> | null, output: Array<T>, recursive: boolean): void {
+  //   if (node) {
+  //     if (recursive) {
+  //       this.serializePostOrder(node.left, output, recursive);
+  //       this.serializePostOrder(node.right, output, recursive);
+  //       output.push(node.value);
+  //     } else {
+  //       let stack: LinkedListStack<BinaryTreeNode<T>> = new LinkedListStack<BinaryTreeNode<T>>();
+  //       let n: BinaryTreeNode<T> | null | undefined = node;
+  //       let prev: BinaryTreeNode<T> | null | undefined;
 
-        do {
-          while (n) {
-            stack.push(n);
-            n = n.left;
-          }
-          while (!n && stack.size > 0) {
-            n = stack.peek();
-            if (!n?.right || n.right == prev) {
-              output.push(n?.value as T);
-              stack.pop();
+  //       do {
+  //         while (n) {
+  //           stack.push(n);
+  //           n = n.left;
+  //         }
+  //         while (!n && stack.size > 0) {
+  //           n = stack.peek();
+  //           if (!n?.right || n.right == prev) {
+  //             output.push(n?.value as T);
+  //             stack.pop();
 
-              prev = n;
-              n = null; // undefined;
-            } else {
-              n = n.right;
-            }
-          }
-        } while (stack.size > 0);
-      }
-    }
-  }
+  //             prev = n;
+  //             n = null; // undefined;
+  //           } else {
+  //             n = n.right;
+  //           }
+  //         }
+  //       } while (stack.size > 0);
+  //     }
+  //   }
+  // }
 
-  protected traverseLevelOrder(node: BinaryTreeNode<T> | null, output: Array<T>, recursive: boolean): void {
-    for (let i = 1; i <= this.height; i++) {
-      this._traverseLevelOrder(this._root, output, i);
-    }
-  }
+  // protected serializeLevelOrder(node: BinaryTreeNode<T> | null, output: Array<T>, recursive: boolean): void {
+  //   for (let i = 1; i <= this.height; i++) {
+  //     this._serializeLevelOrder(this._root, output, i);
+  //   }
+  // }
 
-  protected _traverseLevelOrder(node: BinaryTreeNode<T> | null, output: Array<T>, level: number): void {
-    if (node) {
-      if (level === 1) {
-        output.push(node.value);
-      } else if (level > 1) {
-        this._traverseLevelOrder(node.left, output, level - 1);
-        this._traverseLevelOrder(node.right, output, level - 1);
-      }
-    }
-  }
+  // protected _serializeLevelOrder(node: BinaryTreeNode<T> | null, output: Array<T>, level: number): void {
+  //   if (node) {
+  //     if (level === 1) {
+  //       output.push(node.value);
+  //     } else if (level > 1) {
+  //       this._serializeLevelOrder(node.left, output, level - 1);
+  //       this._serializeLevelOrder(node.right, output, level - 1);
+  //     }
+  //   }
+  // }
 }

@@ -1,5 +1,6 @@
 import { LinkedListStack } from "@src/data-structures/stack/linked-list-stack";
-import { BinaryTree, BinaryTreeNode, NodeValueComparer, TreeTraversal } from ".";
+import { BinaryTree, BinaryTreeNode, NodeValueComparer } from ".";
+import { TreeTraversal } from "./serializer";
 
 export class BinarySearchTree<T> extends BinaryTree<T> {
   public add(value: T): void {
@@ -84,21 +85,21 @@ export class BinarySearchTree<T> extends BinaryTree<T> {
     // console.log(JSON.stringify(this._root));
   }
 
-  public buildTree(order: TreeTraversal, nodes: Array<T>, levelOrderNodes?: Array<T>): void {
-    this.clear();
+  // public deserialize(order: TreeTraversal, nodes: Array<T>, levelOrderNodes?: Array<T>): void {
+  //   this.clear();
 
-    switch (order) {
-      case "inorder":
-        this._buildTreeInorder(nodes, levelOrderNodes as Array<T>);
-        break;
-      case "preorder":
-        this._buildTreePreorder(nodes);
-        break;
-      case "postorder":
-        this._buildTreePostorder(nodes);
-        break;
-    }
-  }
+  //   switch (order) {
+  //     case "inorder":
+  //       this._buildTreeInorder(nodes, levelOrderNodes as Array<T>);
+  //       break;
+  //     case "preorder":
+  //       this._buildTreePreorder(nodes);
+  //       break;
+  //     case "postorder":
+  //       this._buildTreePostorder(nodes);
+  //       break;
+  //   }
+  // }
 
   protected _getComparer(v1: T, v2: T) {
     let fn: NodeValueComparer<T> | undefined = this.comparer;
@@ -271,48 +272,48 @@ export class BinarySearchTree<T> extends BinaryTree<T> {
   //   nodePtr.node = node;
   // }
 
-  private _buildTreePostorder(nodes: Array<T>): void {
-    if (nodes && nodes.length > 0) {
-      for (let i = nodes.length - 1; i >= 0; i--) {
-        this.add(nodes[i]);
-      }   
-    }
-  }
+  // private _buildTreePostorder(nodes: Array<T>): void {
+  //   if (nodes && nodes.length > 0) {
+  //     for (let i = nodes.length - 1; i >= 0; i--) {
+  //       this.add(nodes[i]);
+  //     }   
+  //   }
+  // }
 
-  private _buildTreePreorder(nodes: Array<T>): void {
-    if (nodes && nodes.length > 0) {
-      let stack: LinkedListStack<BinaryTreeNode<T>> = new LinkedListStack<BinaryTreeNode<T>>();
+  // private _buildTreePreorder(nodes: Array<T>): void {
+  //   if (nodes && nodes.length > 0) {
+  //     let stack: LinkedListStack<BinaryTreeNode<T>> = new LinkedListStack<BinaryTreeNode<T>>();
       
-      for (let i = 0; i < nodes.length; i++) {
-        let n = new BinaryTreeNode<T>(nodes[i]);
-        if (i === 0) {
-          this._root = n;
-        } else {
-          let top = stack.peek();
-          if (top) {
-            if (top.value > n.value) {
-              top.left = n;
-              stack.push(n);
-            } else {
-              let popped = stack.pop();
-              top = stack.peek();
-              while (top && top.value < n.value) {
-                popped = stack.pop();
-                top = stack.peek();
-              }
-              if (popped) {
-                popped.right = n;
-              }
-            }
-          }
-        }
+  //     for (let i = 0; i < nodes.length; i++) {
+  //       let n = new BinaryTreeNode<T>(nodes[i]);
+  //       if (i === 0) {
+  //         this._root = n;
+  //       } else {
+  //         let top = stack.peek();
+  //         if (top) {
+  //           if (top.value > n.value) {
+  //             top.left = n;
+  //             stack.push(n);
+  //           } else {
+  //             let popped = stack.pop();
+  //             top = stack.peek();
+  //             while (top && top.value < n.value) {
+  //               popped = stack.pop();
+  //               top = stack.peek();
+  //             }
+  //             if (popped) {
+  //               popped.right = n;
+  //             }
+  //           }
+  //         }
+  //       }
 
-        if (i < nodes.length - 1) {
-            stack.push(n);
-        }
-      }
-    }
-  }
+  //       if (i < nodes.length - 1) {
+  //           stack.push(n);
+  //       }
+  //     }
+  //   }
+  // }
 
   /*
               20
@@ -340,44 +341,44 @@ export class BinarySearchTree<T> extends BinaryTree<T> {
   In[]    = {22}
   level[] = {22} 
   */
-  private _buildTreeInorder(nodes: Array<T>, levelOrderNodes: Array<T>): void {
-    this._root = this._buildInorderLevelOrderTree(nodes, levelOrderNodes, 0, nodes.length - 1);
-  }
+  // private _buildTreeInorder(nodes: Array<T>, levelOrderNodes: Array<T>): void {
+  //   this._root = this._buildInorderLevelOrderTree(nodes, levelOrderNodes, 0, nodes.length - 1);
+  // }
 
-  private _buildInorderLevelOrderTree(nodes: Array<T>, levelOrderNodes: Array<T>, start: number, end: number): BinaryTreeNode<T> | null {
-    //If start index is more than the end index
-    if (start > end) {
-      return null;
-    }
-    //The first node in level order traversal is root
-    let root: BinaryTreeNode<T> = new BinaryTreeNode<T>(levelOrderNodes[0]);
+  // private _buildInorderLevelOrderTree(nodes: Array<T>, levelOrderNodes: Array<T>, start: number, end: number): BinaryTreeNode<T> | null {
+  //   //If start index is more than the end index
+  //   if (start > end) {
+  //     return null;
+  //   }
+  //   //The first node in level order traversal is root
+  //   let root: BinaryTreeNode<T> = new BinaryTreeNode<T>(levelOrderNodes[0]);
 
-    //If this node has no children then return
-    if (start != end) {
-      //index of root in Inorder traversal
-      let inorderIndex = nodes.slice(start, end).indexOf(root.value);
+  //   //If this node has no children then return
+  //   if (start != end) {
+  //     //index of root in Inorder traversal
+  //     let inorderIndex = nodes.slice(start, end).indexOf(root.value);
 
-      //left subtree
-      let leftLevelNodes = this._buildLevelOrderArray(nodes, levelOrderNodes, inorderIndex);
+  //     //left subtree
+  //     let leftLevelNodes = this._buildLevelOrderArray(nodes, levelOrderNodes, inorderIndex);
 
-      //right subtree
-      let rightLevelNodes = this._buildLevelOrderArray(nodes.slice(inorderIndex + 1), levelOrderNodes, levelOrderNodes.length - inorderIndex - 1);
+  //     //right subtree
+  //     let rightLevelNodes = this._buildLevelOrderArray(nodes.slice(inorderIndex + 1), levelOrderNodes, levelOrderNodes.length - inorderIndex - 1);
 
-      root.left = this._buildInorderLevelOrderTree(nodes, leftLevelNodes, start, inorderIndex - 1);
-      root.right = this._buildInorderLevelOrderTree(nodes, rightLevelNodes, inorderIndex + 1, end);
-    }
+  //     root.left = this._buildInorderLevelOrderTree(nodes, leftLevelNodes, start, inorderIndex - 1);
+  //     root.right = this._buildInorderLevelOrderTree(nodes, rightLevelNodes, inorderIndex + 1, end);
+  //   }
 
-    return root;
-  }
+  //   return root;
+  // }
 
-  private _buildLevelOrderArray(nodes: Array<T>, levelOrderNodes: Array<T>, end: number): Array<T> {
-    let newLevel: Array<T> = [];
-    for (let i = 0; i < levelOrderNodes.length; i++) {
-      if (nodes.slice(0, end - 1).indexOf(levelOrderNodes[i]) >= 0) {
-        newLevel.push(levelOrderNodes[i]);
-      }
-    }
+  // private _buildLevelOrderArray(nodes: Array<T>, levelOrderNodes: Array<T>, end: number): Array<T> {
+  //   let newLevel: Array<T> = [];
+  //   for (let i = 0; i < levelOrderNodes.length; i++) {
+  //     if (nodes.slice(0, end - 1).indexOf(levelOrderNodes[i]) >= 0) {
+  //       newLevel.push(levelOrderNodes[i]);
+  //     }
+  //   }
 
-    return newLevel;
-  }
+  //   return newLevel;
+  // }
 }
