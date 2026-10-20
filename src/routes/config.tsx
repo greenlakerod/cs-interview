@@ -8,6 +8,7 @@ import Homepage from "@src/Homepage";
 import LinkedListVisualizer from "@src/data-structures/linked-list/visualizer";
 import LRUCacheVisualizer from "@src/data-structures/lru-cache/visualizer";
 import BinaryTreeVisualizer from "@src/data-structures/trees/binary-tree/visualizer";
+import { GraphVisualizer } from "@src/data-structures/graph/visualizer";
 
 export const useRoutesConfig = () => {
   const routes: RouteObject[] = [
@@ -26,6 +27,10 @@ export const useRoutesConfig = () => {
     {
       path: "/binary-tree",
       element: <BinaryTreeVisualizer />,
+    },
+    {
+      path: "/graph",
+      element: <GraphVisualizer />,
     },
     // {
     //   path: "mobx",
