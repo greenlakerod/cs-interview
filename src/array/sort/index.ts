@@ -1,6 +1,10 @@
 //https://www.cs.cmu.edu/~adamchik/15-121/lectures/Sorting%20Algorithms/sorting.html
 //https://www.toptal.com/developers/sorting-algorithms
 
+export enum SortType {
+  MergeSort = "mergesort",
+}
+
 export interface ISortIteration {
   iteration: number;
   message?: string;

@@ -10,29 +10,79 @@ import {
   NumericInput
 } from "@blueprintjs/core";
 import "./Visualizer.css";
+import { Sorter, SortType } from "./sort";
+import MenuDropdown from "@src/components/MenuDropdown";
+import { MergeSort } from "./sort/merge-sort";
 
-interface ArrayItem {
+interface ArrayItemProps {
   id: string;
-  value: number | string;
+  index?: number;
+  value: number;
 }
 
-export const ArrayVisualizer: React.FC = () => {
-  const [array, setArray] = useState<ArrayItem[]>([
-    { id: "1", value: 12 },
-    { id: "2", value: 45 },
-    { id: "3", value: 7 },
-    { id: "4", value: 89 },
-    { id: "5", value: 23 },
-  ]);
+interface ArrayTrackProps {
+  label?: string;
+  items: ArrayItemProps[];
+}
 
+const ArrayItem: React.FC<ArrayItemProps> = ({ id, index, value }) => {
+  return (
+    <div key={id} className="array-cell-container">
+      {/* Top: Contiguous Visual Cell */}
+      <div className="array-cell">
+        <span className="cell-value">{value}</span>
+      </div>
+      
+      {/* Bottom: Index Indicator */}
+      <div className="cell-index bp5-text-muted">[{index}]</div>
+    </div>
+  );
+};
+
+const ArrayTrack: React.FC<ArrayTrackProps> = ({ label, items }) => {
+  return (
+    items.length === 0 ? (
+      <>
+        {label && <div>{label}</div>}
+        <div className="empty-state-message bp5-text-muted">
+          Array is empty
+        </div>
+      </>
+    ) : 
+    <div className="array-track" style={{ marginBottom: "24px" }}>
+      {label && <div>{label}</div>}
+      {items.map((item, index) => (
+        <ArrayItem {...{ ...item, index }} />
+      ))}
+    </div>
+  );
+};
+
+const INITIAL_ARRAY: ArrayItemProps[] = [
+  { id: "1", value: 12 },
+  { id: "2", value: 45 },
+  { id: "3", value: 7 },
+  { id: "4", value: 89 },
+  { id: "5", value: 23 },
+  { id: "6", value: 150 },
+  { id: "7", value: 32 },
+  { id: "8", value: 4 },
+  { id: "9", value: 60 },
+  { id: "10", value: 36 },
+];
+
+export const ArrayVisualizer: React.FC = () => {
+  const sorter = React.useRef<Sorter<number>>(undefined);
+  const [array, setArray] = useState<ArrayItemProps[]>(INITIAL_ARRAY);
+  const [arrayIterations, setArrayIterations] = useState<ArrayTrackProps[]>([{ items: array }]);
   const [inputValue, setInputValue] = useState<string>("");
   const [targetIndex, setTargetIndex] = useState<number>(0);
 
   const handlePush = () => {
     if (inputValue.trim() === "") return;
-    const newItem: ArrayItem = {
+    const newItem: ArrayItemProps = {
       id: Math.random().toString(36).substr(2, 9),
-      value: isNaN(Number(inputValue)) ? inputValue : Number(inputValue),
+      value: isNaN(Number(inputValue)) ? parseInt(inputValue, 10) : Number(inputValue),
     };
     setArray([...array, newItem]);
     setInputValue("");
@@ -49,7 +99,7 @@ export const ArrayVisualizer: React.FC = () => {
     const updatedArray = [...array];
     updatedArray[targetIndex] = {
       ...updatedArray[targetIndex],
-      value: isNaN(Number(inputValue)) ? inputValue : Number(inputValue),
+      value: isNaN(Number(inputValue)) ? parseInt(inputValue, 10) : Number(inputValue),
     };
     setArray(updatedArray);
     setInputValue("");
@@ -69,25 +119,9 @@ export const ArrayVisualizer: React.FC = () => {
 
         {/* Horizontal Array Wrapper */}
         <div className="array-track-wrapper">
-          {array.length === 0 ? (
-            <div className="empty-state-message bp5-text-muted">
-              Array is empty. Add elements below to populate it.
-            </div>
-          ) : (
-            <div className="array-track">
-              {array.map((item, index) => (
-                <div key={item.id} className="array-cell-container">
-                  {/* Top: Contiguous Visual Cell */}
-                  <div className="array-cell">
-                    <span className="cell-value">{item.value}</span>
-                  </div>
-                  
-                  {/* Bottom: Index Indicator */}
-                  <div className="cell-index bp5-text-muted">[{index}]</div>
-                </div>
-              ))}
-            </div>
-          )}
+          {arrayIterations.map(iteration => (
+            <ArrayTrack {...iteration} />
+          ))}
         </div>
 
         <Divider />
@@ -132,7 +166,49 @@ export const ArrayVisualizer: React.FC = () => {
               disabled={!inputValue.trim() || array.length === 0 || targetIndex >= array.length} 
             />
           </ButtonGroup>
-          
+          <MenuDropdown
+            text="Sort"
+            menuItems={[
+              { 
+                text: "MergeSort", 
+                onClick: () => {
+                  sorter.current = new MergeSort();
+                  sorter.current.sort(array.map(i => i.value));
+
+                  const results = sorter.current.results;
+                  let iterations: ArrayTrackProps[] = [];
+
+                  results.iterations.forEach(iteration => {
+                    iterations.push({
+                      label: `${iteration.iteration}: ${iteration.message ?? "Result"}`,
+                      items: iteration.array.map((value, index) => ({
+                        index,
+                        id: `${index + 1}`,
+                        value: parseInt(value, 10),
+                      })),
+                    });
+                  });
+
+                  setArrayIterations(iterations);
+
+                  /*
+
+                  interface ArrayItemProps {
+                    id: string;
+                    index?: number;
+                    value: number;
+                  }
+
+                  interface ArrayTrackProps {
+                    label?: string;
+                    items: ArrayItemProps[];
+                  }
+
+                  */
+                },
+              },
+            ]}
+          />
           <Button intent="danger" icon="trash" text="Clear Array" onClick={handleClear} disabled={array.length === 0} />
         </div>
       </Card>

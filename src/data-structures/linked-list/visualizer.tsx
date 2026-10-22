@@ -1,7 +1,7 @@
 import React from "react";
 import { ILinkedList } from ".";
 import styles from "./visualizer.scss";
-import ButtonWithMenu from "@src/components/ButtonWithMenu";
+import MenuDropdown from "@src/components/MenuDropdown";
 import "@blueprintjs/core/lib/css/blueprint.css";
 import { Button, FormGroup, InputGroup, MenuItem, NumericInput, Tooltip } from "@blueprintjs/core/lib/esm";
 import { Select } from "@blueprintjs/select/lib/esm";
@@ -265,7 +265,7 @@ const LinkedListControls: React.FC<LinkedListControlsProps> = ({
           min={0}
         />
       </FormGroup>
-      <ButtonWithMenu
+      <MenuDropdown
         text="Insert at"
         menuItems={[
           { text: "Head", onClick: () => executeInsertion(InsertDeleteOperation.Head) },
@@ -273,7 +273,7 @@ const LinkedListControls: React.FC<LinkedListControlsProps> = ({
           { text: "Index", onClick: () => executeInsertion(InsertDeleteOperation.Index) },
         ]}
       />
-      <ButtonWithMenu
+      <MenuDropdown
         text="Delete at"
         menuItems={[
           { text: "Head", onClick: () => executeDeletion(InsertDeleteOperation.Head) },

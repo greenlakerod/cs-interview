@@ -2,7 +2,7 @@ import React from "react";
 import { Button, ButtonProps, Menu, MenuItem, MenuItemProps, MenuProps, PopoverNext, PopoverNextProps } from "@blueprintjs/core";
 import "@blueprintjs/core/lib/css/blueprint.css";
 
-export interface ButtonWithMenuProps {
+export interface MenuDropdownProps {
   buttonProps?: ButtonProps;
   menuItems: MenuItemProps[];
   menuProps?: MenuProps;
@@ -10,7 +10,7 @@ export interface ButtonWithMenuProps {
   text: string;
 }
 
-const ButtonWithMenu: React.FC<ButtonWithMenuProps> = (props) => {
+const MenuDropdown: React.FC<MenuDropdownProps> = (props) => {
   const {
     buttonProps = { intent: "primary", size: "medium" },
     menuItems,
@@ -51,4 +51,4 @@ const ButtonWithMenu: React.FC<ButtonWithMenuProps> = (props) => {
   );
 };
 
-export default ButtonWithMenu;
+export default MenuDropdown;
