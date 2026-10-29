@@ -1,5 +1,4 @@
 import { useRoutes } from "react-router-dom";
-
 import { useRoutesConfig } from "./config";
 
 export const Routes = () => {

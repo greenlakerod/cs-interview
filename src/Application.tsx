@@ -6,11 +6,13 @@ import { Routes } from "./routes";
 
 const Application: React.FC = () => {
   return (
-    <BrowserRouter>
-      <Suspense fallback={<>loading...</>}>
-        <Routes />
-      </Suspense>
-    </BrowserRouter>
+    <React.StrictMode>
+      <BrowserRouter>
+        <Suspense fallback={<>loading...</>}>
+          <Routes />
+        </Suspense>
+      </BrowserRouter>
+    </React.StrictMode>
   );
 };
 

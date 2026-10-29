@@ -2,7 +2,7 @@ import { Sorter } from ".";
 
 export class MergeSort<T> extends Sorter<T> {
   public sort(items: Array<T>): void {
-    this._sort(1, items, 0, items.length - 1, "original string");
+    this._sort(1, items, 0, items.length - 1, "original array");
   }
 
   private _merge(iteration: number, items: Array<T>, left: Array<T>, right: Array<T>): void {
@@ -16,19 +16,19 @@ export class MergeSort<T> extends Sorter<T> {
     while (remaining > 0) {
       if (leftIndex >= left.length) {
         items[targetIndex++] = right[rightIndex++];
+        this._results.swaps++;
       } else if (rightIndex >= right.length) {
         items[targetIndex++] = left[leftIndex++];
+        this._results.swaps++;
       } else {
         if (left[leftIndex] < right[rightIndex]) {
           items[targetIndex++] = left[leftIndex++];
         } else {
           items[targetIndex++] = right[rightIndex++];
         }
-
-        this._results.comparisons++;
       }
 
-      this._results.swaps++;
+      this._results.comparisons++;
       remaining--;
     }
 

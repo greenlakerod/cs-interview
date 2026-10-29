@@ -50,7 +50,7 @@ const ArrayTrack: React.FC<ArrayTrackProps> = ({ label, items }) => {
       </>
     ) : 
     <div className="array-track" style={{ marginBottom: "24px" }}>
-      {label && <div>{label}</div>}
+      {label && <div style={{ marginRight: "16px" }}>{label}</div>}
       {items.map((item, index) => (
         <ArrayItem {...{ ...item, index }} />
       ))}

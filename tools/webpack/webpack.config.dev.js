@@ -7,6 +7,7 @@ module.exports = {
   output: {
     filename: '[name].js',
     chunkFilename: '[name].chunk.js',
+    publicPath: "/",
   },
   plugins: require('./webpack.plugins'),
   resolve: {
