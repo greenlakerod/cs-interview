@@ -3,6 +3,7 @@
 
 export enum SortType {
   MergeSort = "mergesort",
+  QuickSort = "quicksort",
 }
 
 export interface ISortIteration {

@@ -13,6 +13,7 @@ import "./Visualizer.css";
 import { Sorter, SortType } from "./sort";
 import MenuDropdown from "@src/components/MenuDropdown";
 import { MergeSort } from "./sort/merge-sort";
+import { QuickSort } from "./sort/quick-sort";
 
 interface ArrayItemProps {
   id: string;
@@ -109,6 +110,35 @@ export const ArrayVisualizer: React.FC = () => {
     setArray([]);
   };
 
+  const handleSort = (sortType: SortType) => {
+    switch (sortType) {
+      case SortType.MergeSort:
+        sorter.current = new MergeSort();
+        break;
+      case SortType.QuickSort:
+        sorter.current = new QuickSort();
+        break;
+    }
+
+    sorter.current.sort(array.map(i => i.value));
+
+    const results = sorter.current.results;
+    let iterations: ArrayTrackProps[] = [];
+
+    results.iterations.forEach(iteration => {
+      iterations.push({
+        label: `${iteration.iteration}: ${iteration.message ?? "Result"}`,
+        items: iteration.array.map((value, index) => ({
+          index,
+          id: `${index + 1}`,
+          value: parseInt(value, 10),
+        })),
+      });
+    });
+
+    setArrayIterations(iterations);
+  };
+
   return (
     <div className="visualizer-container">
       <Card elevation={Elevation.TWO} className="visualizer-card">
@@ -168,46 +198,10 @@ export const ArrayVisualizer: React.FC = () => {
           </ButtonGroup>
           <MenuDropdown
             text="Sort"
-            menuItems={[
-              { 
-                text: "MergeSort", 
-                onClick: () => {
-                  sorter.current = new MergeSort();
-                  sorter.current.sort(array.map(i => i.value));
-
-                  const results = sorter.current.results;
-                  let iterations: ArrayTrackProps[] = [];
-
-                  results.iterations.forEach(iteration => {
-                    iterations.push({
-                      label: `${iteration.iteration}: ${iteration.message ?? "Result"}`,
-                      items: iteration.array.map((value, index) => ({
-                        index,
-                        id: `${index + 1}`,
-                        value: parseInt(value, 10),
-                      })),
-                    });
-                  });
-
-                  setArrayIterations(iterations);
-
-                  /*
-
-                  interface ArrayItemProps {
-                    id: string;
-                    index?: number;
-                    value: number;
-                  }
-
-                  interface ArrayTrackProps {
-                    label?: string;
-                    items: ArrayItemProps[];
-                  }
-
-                  */
-                },
-              },
-            ]}
+            menuItems={Object.entries(SortType).map(([key, value]) => ({
+              text: key,
+              onClick: () => handleSort(value),
+            }))}
           />
           <Button intent="danger" icon="trash" text="Clear Array" onClick={handleClear} disabled={array.length === 0} />
         </div>
