@@ -1,0 +1,55 @@
+  .container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100vh;
+    background-color: #f8fafc;
+    font-family: system-ui, sans-serif;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  .toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 24px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+    // height: 64px !important;
+    z-index: 10;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  }
+
+  .title {
+    margin: 0;
+    margin-right: 16px;
+    font-size: 18px;
+    color: #0f172a;
+  }
+
+  .button {
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #ffffff;
+    background-color: #2563eb;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  .info {
+    margin-left: auto;
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 500;
+  }
+
+  .svgViewport {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    background-color: #f1f5f9;
+  }
